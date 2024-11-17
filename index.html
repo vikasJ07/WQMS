@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Water Quality Monitoring</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(to right, #0072ff, #00c6ff);
+      color: white;
+      text-align: center;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      color: #333;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #0072ff;
+    }
+
+    .sensor-data p {
+      font-size: 18px;
+      margin: 15px 0;
+      background-color: #f7f7f7;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .sensor-data p span {
+      font-weight: bold;
+      color: #0072ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Water Quality Monitoring</h1>
+    <div class="sensor-data">
+      <p>Temperature: <span id="temperature">--</span> °C</p>
+      <p>pH Value: <span id="ph">--</span></p>
+      <p>EC Value: <span id="ec">--</span> mS/cm</p>
+    </div>
+  </div>
+
+  <script type="module">
+    // Import the necessary functions from Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBjm9Eo4o11BrrwT2wMLN4YGbdsoStwIuE",
+      authDomain: "waterqms-b64a3.firebaseapp.com",
+      databaseURL: "https://waterqms-b64a3-default-rtdb.firebaseio.com",
+      projectId: "waterqms-b64a3",
+      storageBucket: "waterqms-b64a3.appspot.com",
+      messagingSenderId: "1048610383573",
+      appId: "1:1048610383573:web:bad6db4edd66dfe259e45c",
+      measurementId: "G-F4WDRQRBX1"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // Elements to update the sensor values
+    const tempValue = document.getElementById('temperature');
+    const phValue = document.getElementById('ph');
+    const ecValue = document.getElementById('ec');
+
+    // Reference to the sensor data in the database
+    const sensorDataRef = ref(database, 'sensor_data');
+
+    onValue(sensorDataRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const keys = Object.keys(data);
+        const latestKey = keys[keys.length - 1]; // Get the last key
+        const latestData = data[latestKey]; // Get the latest data
+
+        if (latestData) {
+          const temp = latestData.temperature;
+          const ph = latestData.ph;
+          const ec = latestData.ec;
+
+          console.log("Latest Temperature:", temp); // Debugging log
+          console.log("Latest ph:", ph); // Debugging log
+          console.log("Latest ec:", ec)
+
+          tempValue.innerText = `${temp} °C`;
+          phValue.innerText = `${ph}`;
+          ecValue.innerText = `${ec}`;
+
+        }
+      } else {
+        console.log('No data available');
+      }
+    });
+  </script>
+</body>
+</html>
